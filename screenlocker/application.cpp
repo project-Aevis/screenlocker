@@ -24,6 +24,7 @@
 #include <QScreen>
 #include <QEvent>
 #include <QtGui/qguiapplication_platform.h>
+#include <utility>
 
 // Qt Quick
 #include <QQuickItem>
@@ -83,7 +84,7 @@ Application::~Application()
 {
     // workaround QTBUG-55460
     // will be fixed when themes port to QQC2
-    for (auto view : qAsConst(m_views)) {
+    for (auto view : std::as_const(m_views)) {
         if (QQuickItem *focusItem = view->activeFocusItem()) {
             focusItem->setFocus(false);
         }
@@ -219,7 +220,7 @@ void Application::getFocus()
 
     // this loop is required to make the qml/graphicsscene properly handle the shared keyboard input
     // ie. "type something into the box of every greeter"
-    for (QQuickView *view : qAsConst(m_views)) {
+    for (QQuickView *view : std::as_const(m_views)) {
         if (!m_testing) {
             view->setKeyboardGrabEnabled(true); // TODO - check whether this still works in master!
         }
@@ -248,7 +249,7 @@ bool Application::eventFilter(QObject *obj, QEvent *event)
 {
     if (obj != this && event->type() == QEvent::Show) {
         QQuickView *view = nullptr;
-        for (QQuickView *v : qAsConst(m_views)) {
+        for (QQuickView *v : std::as_const(m_views)) {
             if (v == obj) {
                 view = v;
                 break;
@@ -293,7 +294,7 @@ QWindow *Application::getActiveScreen()
         return activeScreen;
     }
 
-    for (QQuickView *view : qAsConst(m_views)) {
+    for (QQuickView *view : std::as_const(m_views)) {
         if (view->geometry().contains(QCursor::pos())) {
             activeScreen = view;
             break;
@@ -317,7 +318,7 @@ void Application::shareEvent(QEvent *e, QQuickView *from)
         // Any change in regarded event processing shall be tested thoroughly!
         removeEventFilter(this); // prevent recursion!
         const bool accepted = e->isAccepted(); // store state
-        for (QQuickView *view : qAsConst(m_views)) {
+        for (QQuickView *view : std::as_const(m_views)) {
             if (view != from) {
                 QCoreApplication::sendEvent(view, e);
                 e->setAccepted(accepted);

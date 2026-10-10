@@ -24,7 +24,7 @@ import QtQuick.Layouts 1.12
 import Qt5Compat.GraphicalEffects
 
 import Cutefish.Accounts 1.0 as Accounts
-import Cutefish.System 1.0 as System
+import Cutefish.Appearance 1.0 as Appearance
 import FishUI 1.0 as FishUI
 
 Item {
@@ -35,7 +35,7 @@ Item {
     LayoutMirroring.enabled: Qt.locale().textDirection === Qt.RightToLeft
     LayoutMirroring.childrenInherit: true
 
-    System.Wallpaper {
+    Appearance.Wallpaper {
         id: wallpaper
     }
 
@@ -178,9 +178,20 @@ Item {
 
         Rectangle {
             anchors.fill: parent
-            radius: FishUI.Theme.bigRadius + 2
-            color: FishUI.Theme.darkMode ? "#424242" : "white"
-            opacity: 0.5
+            radius: 22
+            color: FishUI.Theme.darkMode ? Qt.rgba(0.08, 0.09, 0.13, 0.68) : Qt.rgba(1, 1, 1, 0.72)
+            border.width: 1 / FishUI.Dpi.ratio
+            border.color: FishUI.Theme.darkMode ? Qt.rgba(255, 255, 255, 0.18) : Qt.rgba(255, 255, 255, 0.85)
+
+            // Inner Specular Glass Rim
+            Rectangle {
+                anchors.fill: parent
+                anchors.margins: 1
+                radius: 21
+                color: "transparent"
+                border.width: 1 / FishUI.Dpi.ratio
+                border.color: FishUI.Theme.darkMode ? Qt.rgba(255, 255, 255, 0.10) : Qt.rgba(255, 255, 255, 0.45)
+            }
         }
 
         ColumnLayout {
