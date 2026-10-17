@@ -67,7 +67,7 @@ feature_summary(WHAT ALL INCLUDE_QUIET_PACKAGES FATAL_ON_MISSING_REQUIRED_PACKAG
 
 
 # Get the installation directory from qtpaths
-find_program(QT_PATHS_EXECUTABLE NAMES qtpaths6 REQUIRED)
+find_program(QT_PATHS_EXECUTABLE NAMES qtpaths6 qtpaths PATHS /usr/lib/qt6/bin /usr/lib64/qt6/bin REQUIRED)
 execute_process(COMMAND ${QT_PATHS_EXECUTABLE} -query QT_INSTALL_QML
     OUTPUT_VARIABLE INSTALL_QMLDIR
     OUTPUT_STRIP_TRAILING_WHITESPACE
@@ -84,3 +84,4 @@ qt6_add_translation(QM_FILES ${TS_FILES})
 add_custom_target(translations DEPENDS ${QM_FILES} SOURCES ${TS_FILES})
 add_dependencies(cutefish-screenlocker translations)
 install(FILES ${QM_FILES} DESTINATION /usr/share/cutefish-screenlocker/translations)
+install(FILES ${QM_FILES} DESTINATION /usr/share/aevis-screenlocker/translations)

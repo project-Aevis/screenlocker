@@ -1,5 +1,6 @@
 /*
  * Copyright (C) 2021 CutefishOS Team.
+ * Copyright (C) 2026 Project Aevis Contributors.
  *
  * Author:     Reion Wong <aj@cutefishos.com>
  *
@@ -71,6 +72,14 @@ Item {
         anchors.margins: FishUI.Units.largeSpacing
         spacing: FishUI.Units.largeSpacing
 
+        Rectangle {
+            id: artMask
+            width: _mainLayout.height
+            height: width
+            radius: FishUI.Theme.smallRadius
+            visible: false
+        }
+
         Image {
             id: defaultImage
             width: _mainLayout.height
@@ -79,17 +88,10 @@ Item {
             sourceSize: Qt.size(width, height)
             visible: !artImage.visible
 
-            layer.enabled: true
+            layer.enabled: defaultImage.visible
+            layer.smooth: true
             layer.effect: OpacityMask {
-                maskSource: Item {
-                    width: defaultImage.width
-                    height: defaultImage.height
-
-                    Rectangle {
-                        anchors.fill: parent
-                        radius: FishUI.Theme.smallRadius
-                    }
-                }
+                maskSource: artMask
             }
         }
 
@@ -98,20 +100,14 @@ Item {
             Layout.preferredHeight: _mainLayout.height
             Layout.preferredWidth: _mainLayout.height
             visible: status === Image.Ready
-            // sourceSize: Qt.size(width, height)
+            sourceSize: Qt.size(Math.max(64, Math.ceil(_mainLayout.height * FishUI.Dpi.ratio)), Math.max(64, Math.ceil(_mainLayout.height * FishUI.Dpi.ratio)))
+            asynchronous: true
             fillMode: Image.PreserveAspectFit
 
-            layer.enabled: true
+            layer.enabled: artImage.visible
+            layer.smooth: true
             layer.effect: OpacityMask {
-                maskSource: Item {
-                    width: artImage.width
-                    height: artImage.height
-
-                    Rectangle {
-                        anchors.fill: parent
-                        radius: FishUI.Theme.smallRadius
-                    }
-                }
+                maskSource: artMask
             }
         }
 
@@ -160,8 +156,16 @@ Item {
                     width: 30
                     height: 30
                     source: "qrc:/images/" + (FishUI.Theme.darkMode ? "dark" : "light") + "/media-skip-backward-symbolic.svg"
-                    onLeftButtonClicked: if (mprisManager.canGoPrevious) mprisManager.previous()
-                    visible: mprisManager.canGoPrevious
+                    onLeftButtonClicked: {
+                        if (mprisManager.canGoPrevious) {
+                            mprisManager.previous()
+                        } else if (control.available) {
+                            mprisManager.setPosition(0)
+                        }
+                    }
+                    visible: true
+                    enabled: mprisManager.canGoPrevious || control.available
+                    opacity: enabled ? 1.0 : 0.35
                     Layout.alignment: Qt.AlignRight
                 }
 
@@ -171,11 +175,14 @@ Item {
                     source: control.isPlaying ? "qrc:/images/" + (FishUI.Theme.darkMode ? "dark" : "light") + "/media-playback-pause-symbolic.svg"
                                               : "qrc:/images/" + (FishUI.Theme.darkMode ? "dark" : "light") + "/media-playback-start-symbolic.svg"
                     Layout.alignment: Qt.AlignRight
-                    visible: mprisManager.canPause || mprisManager.canPlay
-                    onLeftButtonClicked:
-                        if ((control.isPlaying && mprisManager.canPause) || (!control.isPlaying && mprisManager.canPlay)) {
+                    visible: true
+                    enabled: true
+                    opacity: 1.0
+                    onLeftButtonClicked: {
+                        if (control.available) {
                             mprisManager.playPause()
                         }
+                    }
                 }
 
                 IconButton {
@@ -183,7 +190,9 @@ Item {
                     height: 30
                     source: "qrc:/images/" + (FishUI.Theme.darkMode ? "dark" : "light") + "/media-skip-forward-symbolic.svg"
                     Layout.alignment: Qt.AlignRight
-                    visible: mprisManager.canGoNext
+                    visible: true
+                    enabled: mprisManager.canGoNext || control.available
+                    opacity: enabled ? 1.0 : 0.35
                     onLeftButtonClicked: if (mprisManager.canGoNext) mprisManager.next()
                 }
             }

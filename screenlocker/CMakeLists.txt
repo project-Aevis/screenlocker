@@ -26,3 +26,4 @@ target_link_libraries(cutefish-screenlocker
 )
 
 install(TARGETS cutefish-screenlocker RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
+install(CODE "execute_process(COMMAND \${CMAKE_COMMAND} -E create_symlink cutefish-screenlocker \$ENV{DESTDIR}\${CMAKE_INSTALL_FULL_BINDIR}/aevis-screenlocker)")
